@@ -17,6 +17,7 @@ class CreateEventInteractor:
         end_date = eventDto.end_date
         maximum_attendees = eventDto.maximum_attendees
         venue = eventDto.venue
+        ticket_price = eventDto.ticket_price
 
         organizer = self.storage.get_organizer(organizer)
 
@@ -24,10 +25,16 @@ class CreateEventInteractor:
             raise OrganizerNotFoundException("Organizer is not found")
         if not (event_title and description and start_date and organizer and end_date and venue and maximum_attendees):
             raise InvalidDataException("Data can't be empty")
+        if ticket_price is None:
+            raise InvalidDataException("Data can't be empty")
         if is_paid is None:
             raise InvalidDataException("Data can't be empty")
         
-        event = self.storage.create_event(eventDto)
+        newEvent = self.storage.create_event(eventDto)
+        self.storage.create_ticket(
+            event_id=newEvent,
+            price=eventDto.ticket_price
+        )
 
-        return self.presenter.create_event_success_response(event)
+        return self.presenter.create_event_success_response(newEvent)
         

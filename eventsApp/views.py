@@ -22,13 +22,15 @@ def create_event(request):
         venue = request.data.get("venue")
         is_paid = request.data.get("is_paid")
         maximum_attendees = request.data.get("maximum_attendees")
+        ticket_price = request.data.get("ticket_price")
 
         eventDto = CreateEventDTO(
-            event_title,description,organizer,start_date,end_date,venue,is_paid,maximum_attendees
+            event_title,description,organizer,start_date,end_date,venue,is_paid,maximum_attendees, ticket_price = ticket_price
         )
 
         interactor = CreateEventInteractor(storage=EventStorage(), presenter=EventPresenter())
         response = interactor.create_event(eventDto)
+
 
         return Response(response, 200)
     
