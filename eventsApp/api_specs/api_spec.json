@@ -75,9 +75,12 @@
                 "is_full": {
                     "type": "string",
                     "format": "boolean"
+                },
+                "ticket_price": {
+                    "type": "string"
                 }
             },
-            "required": ["event_title","description","organizer","start_date","end_date","venue","is_paid", "maximum_attendees"]
+            "required": ["event_title","description","organizer","start_date","end_date","venue","is_paid", "maximum_attendees", "ticket_price"]
         }
     },
     "paths": {

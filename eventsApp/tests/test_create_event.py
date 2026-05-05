@@ -21,7 +21,8 @@ class TestCreateEvent:
             end_date= "2026-05-10T13:00:00Z",
             venue= "Gachibowli",
             is_paid= False,
-            maximum_attendees= 100
+            maximum_attendees= 100,
+            ticket_price=0.0
         )
 
         interactor = CreateEventInteractor(storage=EventStorage(), presenter=EventPresenter())
@@ -40,7 +41,8 @@ class TestCreateEvent:
             end_date= "2026-05-10T13:00:00Z",
             venue= "Gachibowli",
             is_paid= True,
-            maximum_attendees= 100
+            maximum_attendees= 100,
+            ticket_price=1000.0
         )
 
         interactor = CreateEventInteractor(storage=EventStorage(), presenter=EventPresenter())
@@ -58,7 +60,8 @@ class TestCreateEvent:
             end_date= "2026-05-10T13:00:00Z",
             venue= "Gachibowli",
             is_paid= True,
-            maximum_attendees= 100
+            maximum_attendees= 100,
+            ticket_price=1000.0
         )
 
         interactor = CreateEventInteractor(storage=EventStorage(), presenter=EventPresenter())

@@ -12,3 +12,4 @@ class CreateEventDTO:
     venue: str
     is_paid: bool
     maximum_attendees: int
+    ticket_price: float
