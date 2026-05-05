@@ -1,0 +1,131 @@
+{
+    "swagger": "2.0",
+    "host": "127.0.0.1:8000",
+    "basePath": "/",
+    "info": {
+        "version": "1.0.0",
+        "title": "Events Manager App API Specification",
+        "description": "This is the API specification for the Events App, which allows users to create, read, update, and delete Events. The API follows RESTful principles and uses JSON for data exchange."
+    },
+    "schemes": [
+        "https",
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "oauth": {
+            "tokenUrl": "http://127.0.0.1:8000/oauth2/token",
+            "flow": "password",
+            "scopes": {
+                "read": "read events",
+                "write": "create events",
+                "update": "update events",
+                "delete": "delete events",
+                "admin": "admin access"
+            },
+            "type": "oauth2"
+        }
+    },
+    "definitions": {
+        "CreateEvent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "event_title": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "organizer": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "start_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "end_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "venue": {
+                    "type": "string"
+                },
+                "is_paid": {
+                    "type": "string",
+                    "format": "boolean"
+                },
+                "maximum_attendees": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "is_active": {
+                    "type": "string",
+                    "format": "boolean"
+                },
+                "is_full": {
+                    "type": "string",
+                    "format": "boolean"
+                }
+            },
+            "required": ["event_title","description","organizer","start_date","end_date","venue","is_paid", "maximum_attendees"]
+        }
+    },
+    "paths": {
+        "/events/create": {
+            "post": {
+                "summary": "Create a new Event",
+                "description": "This endpoint allows users to create a new Event",
+                "operationId": "create_event",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Event object that needs to be created",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Event created successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth": ["write", "admin"]
+                    }
+                ]
+            }
+        }
+    }
+}
