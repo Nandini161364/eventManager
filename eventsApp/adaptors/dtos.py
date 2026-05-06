@@ -19,3 +19,8 @@ class CreatePersonDTO:
     name: str
     email: str
     password: str
+
+@dataclass
+class CreateBookingDto:
+    event_id: int
+    attendee_id: int
