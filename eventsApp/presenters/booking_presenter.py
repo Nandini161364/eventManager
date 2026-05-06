@@ -23,3 +23,7 @@ class BookingPresenter:
         return {
             "message": "Tickets already full"
         }
+    def already_booked(self):
+        return {
+            "message": "Already Registered for the Event"
+        }

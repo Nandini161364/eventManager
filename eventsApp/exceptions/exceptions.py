@@ -15,3 +15,6 @@ class AttendeeDoesnotExist(Exception):
 
 class TicketsNotAvailableException(Exception):
     pass
+
+class AlreadyBookedException(Exception):
+    pass

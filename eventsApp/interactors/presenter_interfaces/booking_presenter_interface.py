@@ -15,3 +15,7 @@ class BookingPresenterInterface(ABC):
     @abstractmethod
     def booking_success(self, bookingId: int):
         pass
+
+    @abstractmethod
+    def already_booked(self):
+        pass

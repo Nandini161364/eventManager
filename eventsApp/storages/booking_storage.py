@@ -17,13 +17,23 @@ class BookingStorage:
         if not event:
             return None
         maximum_seats =  event.maximum_attendees
-        current_seats_count = Booking.objects.filter(event_id=event_id, booking_status = "Booked").count()
+        current_seats_count = Booking.objects.filter(event_id=event_id, booking_status = "booked").count()
 
         if current_seats_count< maximum_seats:
             return True
         else:
             return False
     
+    def is_already_booked(self, bookingDto):
+        try:
+            return Booking.objects.filter(
+                event_id = bookingDto.event_id,
+                attendee_id = bookingDto.attendee_id,
+                booking_status = 'booked'
+            ).exists()
+        except Booking.DoesNotExist:
+            return None
+
     def create_booking(self, bookingDto):
         self.bookingDto = bookingDto
         event_id = bookingDto.event_id
@@ -33,7 +43,7 @@ class BookingStorage:
         response = Booking.objects.create(
             attendee_id = attendee_id,
             event_id = event_id,
-            booking_status = "Booked",
+            booking_status = "booked",
             ticket=ticket
         )
 
