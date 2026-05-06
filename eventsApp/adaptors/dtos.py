@@ -13,3 +13,9 @@ class CreateEventDTO:
     is_paid: bool
     maximum_attendees: int
     ticket_price: float
+
+@dataclass
+class CreatePersonDTO:
+    name: str
+    email: str
+    password: str
