@@ -16,7 +16,7 @@ from eventsApp.interactors.create_event_interactor import CreateEventInteractor
 from eventsApp.interactors.person_interactor import CreatePersonInteractor
 from eventsApp.interactors.booking_interactor import BookingInteractor
 
-from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException
+from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException
 
 @api_view(['POST'])
 def create_event(request):
@@ -88,8 +88,9 @@ def event_booking(request):
 
     except InvalidDataException as e:
         return Response(BookingPresenter().invalid_data(), 400)
+    except AlreadyBookedException as e:
+        return Response(BookingPresenter().already_booked(), 400)
     except EventDoesnotExistException as e:
-        print("Invalid Event")
         return Response(BookingPresenter().invalid_event(), 400)
     except AttendeeDoesnotExist as e:
         return Response(BookingPresenter().invalid_attendee(), 400)

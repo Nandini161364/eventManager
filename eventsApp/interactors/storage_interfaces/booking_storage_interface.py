@@ -16,3 +16,7 @@ class BookingStorageInterface(ABC):
     @abstractmethod
     def seats_available(self, event_id:int):
         pass
+
+    @abstractmethod
+    def is_already_booked(self, bookingDto:CreateBookingDto):
+        pass
