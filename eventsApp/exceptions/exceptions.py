@@ -24,3 +24,6 @@ class InvalidBookingIdException(Exception):
 
 class EventNotFoundException(Exception):
     pass
+
+class InvalidBookingException(Exception):
+    pass

@@ -63,3 +63,10 @@ class EventDetailsDto:
     booking_cancelled_users: List[AttendeeDetailsDto]
     booking_pending_users: List[AttendeeDetailsDto]
     ticket_details: List[TicketDetailsDto]
+
+@dataclass
+class FeedbackDto:
+    rating: int
+    comment: str
+    event_id: int
+    attendee_id: int

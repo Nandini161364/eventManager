@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import create_event, user_login, event_booking, cancel_booking, get_event_details
+from .views import create_event, user_login, event_booking, cancel_booking, get_event_details, give_feedback
 
 urlpatterns = [
     path('create/', create_event, name='create_event'),
     path('user/', user_login, name='login'),
     path('booking/', event_booking, name='booking'),
     path('cancel-booking/', cancel_booking, name='cancel_booking'),
-    path('get-event/<int:event_id>/',get_event_details, name='get_event_details')
+    path('get-event/<int:event_id>/',get_event_details, name='get_event_details'),
+    path('feedback/', give_feedback, name='give_feedback')
 ]

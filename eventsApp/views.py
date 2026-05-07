@@ -2,22 +2,25 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from eventsApp.adaptors.dtos import CreateEventDTO, CreatePersonDTO, CreateBookingDto, CancelBookingDto
+from eventsApp.adaptors.dtos import CreateEventDTO, CreatePersonDTO, CreateBookingDto, CancelBookingDto, FeedbackDto
 
 from eventsApp.storages.event_storage import EventStorage
 from eventsApp.storages.person_storage import PersonStorage
 from eventsApp.storages.booking_storage import BookingStorage
+from eventsApp.storages.feedback_storage import FeedbackStorage
 
 from eventsApp.presenters.event_presenter import EventPresenter
 from eventsApp.presenters.person_presenter import PersonPresenter
 from eventsApp.presenters.booking_presenter import BookingPresenter
+from eventsApp.presenters.feedback_presenter import FeedbackPresenter
 
 from eventsApp.interactors.create_event_interactor import CreateEventInteractor
 from eventsApp.interactors.person_interactor import CreatePersonInteractor
 from eventsApp.interactors.booking_interactor import BookingInteractor
 from eventsApp.interactors.get_event_details_interactor import GetEventDetailsInteractor
+from eventsApp.interactors.feedback_interactor import FeedBackInteractor
 
-from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException
+from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException
 
 @api_view(['POST'])
 def create_event(request):
@@ -128,4 +131,30 @@ def get_event_details(request, event_id):
         return Response(response, 200)
     except EventNotFoundException as e:
         return Response(EventPresenter().invalid_event(), 400)
-    
+
+@api_view(['POST'])
+def give_feedback(request):
+    try:
+        rating = request.data.get('rating')
+        comment = request.data.get('comment')
+        event_id = request.data.get('event_id')
+        attendee_id = request.data.get('attendee_id')
+
+        feedbackDto = FeedbackDto(
+            rating, comment, event_id, attendee_id
+        )
+
+        interactor = FeedBackInteractor(storage=FeedbackStorage(), presenter=FeedbackPresenter())
+
+        response = interactor.create_feedback(feedbackDto)
+
+        return Response(response, 200)
+    except EventNotFoundException as e:
+        return Response(FeedbackPresenter().invalid_event(), 400)
+    except AttendeeDoesnotExist as e:
+        return Response(FeedbackPresenter().invalid_user(), 400)
+    except InvalidBookingException as e:
+        return Response(FeedbackPresenter().invalid_booking(), 400)
+
+
+        
