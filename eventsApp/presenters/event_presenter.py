@@ -18,10 +18,10 @@ class EventPresenter(EventPresenterInterface):
         return {
             "message": "Event not found"
         }
-    # def dummy_event(self):
-    #     return {
-    #         "message": "Dummy Function"
-    #     }
+    def no_access(self):
+        return {
+            "message": "User has no permission for event creation, organizer only can create"
+        }
 
     def get_event_details_success_response(self, eventDetailsDto):
         return {
@@ -35,8 +35,6 @@ class EventPresenter(EventPresenterInterface):
             'organizer_details': [
                 {
                     'organizer_id': organizer.organizer_id,
-                    'organization_name': organizer.organization_name,
-                    'organization_email':organizer.organization_email,
                     'organizer_email':organizer.organizer_email,
                     'organizer_name': organizer.organizer_name,
                 } for organizer in eventDetailsDto.organizer_details

@@ -1,8 +1,8 @@
-class PersonPresenter:
-    def create_person_success_response(self, personId):
+class UserPresenter:
+    def create_user_success_response(self, userId):
         return {
-            "message": "Person created Successfully",
-            "id": personId
+            "message": "User created Successfully",
+            "id": userId
         }
     def invalid_data(self):
         return {

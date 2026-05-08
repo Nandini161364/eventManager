@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 
-class PersonPresenterInterface(ABC):
+class UserPresenterInterface(ABC):
     @abstractmethod
-    def create_person_success_response(self, personId):
+    def create_user_success_response(self, personId):
         pass
 
     @abstractmethod

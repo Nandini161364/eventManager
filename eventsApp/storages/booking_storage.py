@@ -1,4 +1,4 @@
-from eventsApp.models import Event, Person, Ticket, Booking
+from eventsApp.models import Event, User, Ticket, Booking
 from django.db.models import Q
 
 class BookingStorage:
@@ -9,8 +9,8 @@ class BookingStorage:
             return None
     def get_attendee_by_id(self, attendee_id):
         try:
-            return Person.objects.get(id=attendee_id)
-        except Person.DoesNotExist:
+            return User.objects.get(id=attendee_id)
+        except User.DoesNotExist:
             return None
     
     def seats_available(self, event_id):

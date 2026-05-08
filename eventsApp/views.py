@@ -1,33 +1,40 @@
+# from oauth2_provider.contrib.rest_framework import OAuth2Authentication
+# from oauth2_provider.decorators import protected_resource
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import permission_classes
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from eventsApp.adaptors.dtos import CreateEventDTO, CreatePersonDTO, CreateBookingDto, CancelBookingDto, FeedbackDto
+from eventsApp.adaptors.dtos import CreateEventDTO, CreateUserDTO, CreateBookingDto, CancelBookingDto, FeedbackDto
 
 from eventsApp.storages.event_storage import EventStorage
-from eventsApp.storages.person_storage import PersonStorage
+from eventsApp.storages.user_storage import UserStorage
 from eventsApp.storages.booking_storage import BookingStorage
 from eventsApp.storages.feedback_storage import FeedbackStorage
 
 from eventsApp.presenters.event_presenter import EventPresenter
-from eventsApp.presenters.person_presenter import PersonPresenter
+from eventsApp.presenters.user_presenter import UserPresenter
 from eventsApp.presenters.booking_presenter import BookingPresenter
 from eventsApp.presenters.feedback_presenter import FeedbackPresenter
 
 from eventsApp.interactors.create_event_interactor import CreateEventInteractor
-from eventsApp.interactors.person_interactor import CreatePersonInteractor
+from eventsApp.interactors.user_interactor import CreateUserInteractor
 from eventsApp.interactors.booking_interactor import BookingInteractor
 from eventsApp.interactors.get_event_details_interactor import GetEventDetailsInteractor
 from eventsApp.interactors.feedback_interactor import FeedBackInteractor
 
-from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException
+from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException, UserCannotCreateEventException
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_event(request):
     try:
         event_title = request.data.get("event_title")
         description = request.data.get("description")
-        organizer = request.data.get("organizer")
+        organizer = request.user
         start_date = request.data.get("start_date")
         end_date = request.data.get("end_date")
         venue = request.data.get("venue")
@@ -36,7 +43,7 @@ def create_event(request):
         ticket_price = request.data.get("ticket_price")
 
         eventDto = CreateEventDTO(
-            event_title,description,organizer,start_date,end_date,venue,is_paid,maximum_attendees, ticket_price = ticket_price
+            event_title,description,organizer.id,start_date,end_date,venue,is_paid,maximum_attendees, ticket_price = ticket_price
         )
 
         interactor = CreateEventInteractor(storage=EventStorage(), presenter=EventPresenter())
@@ -49,36 +56,43 @@ def create_event(request):
         return Response(EventPresenter().organizer_not_found(), status=400)
     except InvalidDataException as e:
         return Response(EventPresenter().invalid_data(), status=400)
+    except UserCannotCreateEventException as e:
+        return Response(EventPresenter().no_access(), status=403)
 
 @api_view(['POST'])
-def user_login(request):
+@permission_classes([AllowAny])
+def register_user(request):
     try:
-        name = request.data.get("name")
-        email = request.data.get("email")
+        username = request.data.get("username")
         password = request.data.get("password")
+        email = request.data.get("email")
+        role = request.data.get("role")
+        phone_number = request.data.get("phone_number")
 
-        #assuming every user as new user for now - later will implement the logic for fetching existing user and creating new only when he is not available in DB
-
-        personDto = CreatePersonDTO(
-            name,
-            email,
-            password
+        user = CreateUserDTO(
+            username=username,
+            password=password,
+            email=email,
+            role=role,
+            phone_number=phone_number
         )
-
-        interactor = CreatePersonInteractor(storage=PersonStorage(), presenter=PersonPresenter())
-        response = interactor.create_person(personDto)
+        interactor = CreateUserInteractor(storage=UserStorage(), presenter=UserPresenter())
+        response = interactor.create_user(user)
 
         return Response(response, 200)
+
     except UserAlreadyExitsException as e:
-        return Response(PersonPresenter().invalid_mail(), 400)
+        return Response(UserPresenter().invalid_mail(), 400)
     except InvalidDataException as e:
-        return Response(PersonPresenter().invalid_data(), 400)
+        return Response(UserPresenter().invalid_data(), 400)
+
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def event_booking(request):
     try:
         event_id = request.data.get('event_id')
-        attendee_id = request.data.get('attendee_id')
+        attendee_id = request.user.id
 
         bookingDto = CreateBookingDto(
             event_id,
@@ -103,11 +117,11 @@ def event_booking(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def cancel_booking(request):
     try:
         booking_id = request.data.get("booking_id")
-        attendee_id = request.data.get("attendee_id")
-
+        attendee_id = request.user.id
         cancelBookingDto = CancelBookingDto(booking_id, attendee_id)
 
         interactor = BookingInteractor(storage=BookingStorage(), presenter=BookingPresenter())
@@ -122,6 +136,7 @@ def cancel_booking(request):
         return Response(BookingPresenter().invalid_booking(), 400)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_event_details(request, event_id):
     try:
         interactor = GetEventDetailsInteractor(storage=EventStorage(), presenter = EventPresenter())
@@ -133,12 +148,13 @@ def get_event_details(request, event_id):
         return Response(EventPresenter().invalid_event(), 400)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def give_feedback(request):
     try:
         rating = request.data.get('rating')
         comment = request.data.get('comment')
         event_id = request.data.get('event_id')
-        attendee_id = request.data.get('attendee_id')
+        attendee_id = request.user.id
 
         feedbackDto = FeedbackDto(
             rating, comment, event_id, attendee_id
@@ -156,5 +172,8 @@ def give_feedback(request):
     except InvalidBookingException as e:
         return Response(FeedbackPresenter().invalid_booking(), 400)
 
+# @api_view(['GET'])
+# def get_attendee_details(request):
+#     pass
 
         

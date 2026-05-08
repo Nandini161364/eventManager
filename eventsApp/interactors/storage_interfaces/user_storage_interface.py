@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from eventsApp.adaptors.dtos import CreatePersonDTO
+from eventsApp.adaptors.dtos import CreateUserDTO
 
-class PersonStorageInterface(ABC):
+class UserStorageInterface(ABC):
     @abstractmethod
-    def create_person(self, personDto: CreatePersonDTO):
+    def create_user(self, userDto: CreateUserDTO):
         pass
     @abstractmethod
     def get_person_by_mail(self, email: str):

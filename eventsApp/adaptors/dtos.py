@@ -16,10 +16,12 @@ class CreateEventDTO:
     ticket_price: float
 
 @dataclass
-class CreatePersonDTO:
-    name: str
+class CreateUserDTO:
+    username: str
     email: str
     password: str
+    phone_number: str
+    role: str
 
 @dataclass
 class CreateBookingDto:
@@ -33,8 +35,6 @@ class CancelBookingDto:
 
 @dataclass
 class OrganizerDetailsDto:
-    organization_name: str
-    organization_email: str
     organizer_name: str
     organizer_email:str
     organizer_id: int
