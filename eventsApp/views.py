@@ -1,6 +1,7 @@
 # from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 # from oauth2_provider.decorators import protected_resource
 
+import sentry_sdk
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes
 
@@ -113,6 +114,7 @@ def event_booking(request):
     except AttendeeDoesnotExist as e:
         return Response(BookingPresenter().invalid_attendee(), 400)
     except TicketsNotAvailableException as e:
+        sentry_sdk.capture_exception(e)
         return Response(BookingPresenter().seats_full(), 400)
 
 
@@ -165,6 +167,8 @@ def give_feedback(request):
         response = interactor.create_feedback(feedbackDto)
 
         return Response(response, 200)
+    except InvalidDataException as e:
+        return Response(FeedbackPresenter.invalid_data(), 400)
     except EventNotFoundException as e:
         return Response(FeedbackPresenter().invalid_event(), 400)
     except AttendeeDoesnotExist as e:

@@ -22,12 +22,17 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+# def trigger_error(request):
+#     division_by_zero = 1 / 0
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
-    path('event/', include('eventsApp.urls'))
+    path('event/', include('eventsApp.urls')),
+    # path('sentry-debug/', trigger_error)
 ]
+
 
 

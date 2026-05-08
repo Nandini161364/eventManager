@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+import django.db.models.signals
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,9 +30,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o!@6%7dk^l_+gpmxmp9zx62n5gmtc-&p2)amdv-buh^2%c@@!p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['eventmanager-zz07.onrender.com']
 
 
 # Application definition
@@ -143,3 +148,26 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'eventsApp.User'
+
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+
+    send_default_pii=False,
+
+    integrations=[
+        DjangoIntegration(
+            transaction_style='url',
+            middleware_spans=True,
+            signals_spans=True,
+            signals_denylist=[
+                django.db.models.signals.pre_init,
+                django.db.models.signals.post_init,
+            ],
+            cache_spans=False,
+            http_methods_to_capture=("GET", "DELETE", "POST", "PUT"),
+        ),
+    ],
+
+    traces_sample_rate=1.0,
+    environment="production",
+)
