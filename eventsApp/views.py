@@ -123,8 +123,9 @@ def event_booking(request):
 def cancel_booking(request):
     try:
         booking_id = request.data.get("booking_id")
+        event_id = request.data.get("event_id")
         attendee_id = request.user.id
-        cancelBookingDto = CancelBookingDto(booking_id, attendee_id)
+        cancelBookingDto = CancelBookingDto(booking_id, attendee_id, event_id)
 
         interactor = BookingInteractor(storage=BookingStorage(), presenter=BookingPresenter())
         response = interactor.cancel_booking(cancelBookingDto)

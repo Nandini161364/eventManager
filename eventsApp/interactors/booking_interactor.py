@@ -28,6 +28,7 @@ class BookingInteractor:
         if is_already_booked:
             raise AlreadyBookedException("Already registered")
         if not seats_available:
+            self.storage.create_booking(bookingDto, 'waitlisted')
             raise TicketsNotAvailableException("Tickets not Available")
         
         newBookingId = ""
@@ -35,7 +36,7 @@ class BookingInteractor:
         if is_pending_or_cancelled_booking_exists:
             newBookingId = self.storage.update_booking(bookingDto)
         else:
-            newBookingId = self.storage.create_booking(bookingDto)
+            newBookingId = self.storage.create_booking(bookingDto, 'booked')
         
 
         return self.presenter.booking_success(newBookingId)
