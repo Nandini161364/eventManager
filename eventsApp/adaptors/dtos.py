@@ -32,6 +32,7 @@ class CreateBookingDto:
 class CancelBookingDto:
     booking_id: int
     attendee_id: int
+    event_id: int
 
 @dataclass
 class OrganizerDetailsDto:

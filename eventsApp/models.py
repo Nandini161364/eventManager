@@ -57,13 +57,14 @@ class Booking(models.Model):
         ('pending', 'Pending'),
         ('booked', 'Booked'),
         ('cancelled', 'Cancelled'),
+        ('waitlisted','Waitlisted')
     ]
 
     attendee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='bookings')
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='bookings')
     booking_date = models.DateTimeField(auto_now_add=True)
-    booking_status = models.CharField(max_length=100, choices=booking_status)
+    booking_status = models.CharField(max_length=100, choices=booking_status, default='pending')
     
 
     class Meta:
