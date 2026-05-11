@@ -29,6 +29,10 @@ from eventsApp.interactors.feedback_interactor import FeedBackInteractor
 
 from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException, UserCannotCreateEventException, UserCannotAccessEventException
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_event(request):
@@ -180,8 +184,18 @@ def give_feedback(request):
     except InvalidBookingException as e:
         return Response(FeedbackPresenter().invalid_booking(), 400)
 
-# @api_view(['GET'])
-# def get_attendee_details(request):
-#     pass
+@api_view(['POST'])
+def make_superuser(request):
 
+    email = request.data.get("email")
+
+    user = User.objects.get(email=email)
+
+    user.is_staff = True
+    user.is_superuser = True
+    user.save()
+
+    return Response({
+        "message": "User promoted successfully"
+    })
         
