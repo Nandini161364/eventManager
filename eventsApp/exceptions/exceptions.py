@@ -30,3 +30,5 @@ class InvalidBookingException(Exception):
 
 class UserCannotCreateEventException(Exception):
     pass
+class UserCannotAccessEventException(Exception):
+    pass

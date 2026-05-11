@@ -27,7 +27,7 @@ from eventsApp.interactors.booking_interactor import BookingInteractor
 from eventsApp.interactors.get_event_details_interactor import GetEventDetailsInteractor
 from eventsApp.interactors.feedback_interactor import FeedBackInteractor
 
-from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException, UserCannotCreateEventException
+from eventsApp.exceptions.exceptions import OrganizerNotFoundException, InvalidDataException, UserAlreadyExitsException, EventDoesnotExistException, AttendeeDoesnotExist, TicketsNotAvailableException, AlreadyBookedException, InvalidBookingIdException, EventNotFoundException, InvalidBookingException, UserCannotCreateEventException, UserCannotAccessEventException
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -142,13 +142,16 @@ def cancel_booking(request):
 @permission_classes([IsAuthenticated])
 def get_event_details(request, event_id):
     try:
+        user_id = request.user.id
         interactor = GetEventDetailsInteractor(storage=EventStorage(), presenter = EventPresenter())
 
-        response = interactor.get_event_details(event_id)
+        response = interactor.get_event_details(event_id, user_id)
 
         return Response(response, 200)
     except EventNotFoundException as e:
         return Response(EventPresenter().invalid_event(), 400)
+    except UserCannotAccessEventException as e:
+        return Response(EventPresenter().no_permission(), 403)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

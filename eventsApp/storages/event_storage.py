@@ -25,6 +25,11 @@ class EventStorage(EventStorageInterface):
             return Event.objects.filter(id=event_id).exists()
         except Event.DoesNotExist:
             return None
+    def is_organizer(self, event_id, user_id):
+        try:
+            return Event.objects.filter(id=event_id, organizer__id=user_id).exists()
+        except Event.DoesNotExist:
+            return None
          
     def get_event_details(self, event_id):
         booking_queryset = Booking.objects.select_related('attendee').only(
@@ -94,8 +99,12 @@ class EventStorage(EventStorageInterface):
                 TicketDetailsDto(
                     ticket_price=ticket.price
                 ) for ticket in event.tickets.all()
-            ]
+            ],
 
+            total_bookings_count=len(event.booked_bookings),
+            cancelled_bookings_count = len(event.cancelled_bookings),
+            pending_bookings_count=len(event.pending_bookings),
+            available_seats=event.maximum_attendees - len(event.booked_bookings)
         )
 
         return eventData

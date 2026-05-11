@@ -22,6 +22,10 @@ class EventPresenter(EventPresenterInterface):
         return {
             "message": "User has no permission for event creation, organizer only can create"
         }
+    def no_permission(self):
+        return {
+            "message": "User doesn't have permission to access the details"
+        }
 
     def get_event_details_success_response(self, eventDetailsDto):
         return {
@@ -65,5 +69,9 @@ class EventPresenter(EventPresenterInterface):
                 {
                     'ticket_price': ticket.ticket_price
                 } for ticket in eventDetailsDto.ticket_details
-            ]
+            ],
+            'total_bookings_count': eventDetailsDto.total_bookings_count,
+            'cancelled_bookings_count': eventDetailsDto.cancelled_bookings_count,
+            'pending_bookings_count': eventDetailsDto.pending_bookings_count,
+            'available_seats': eventDetailsDto.available_seats
         }

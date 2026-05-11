@@ -64,6 +64,10 @@ class EventDetailsDto:
     booking_cancelled_users: List[AttendeeDetailsDto]
     booking_pending_users: List[AttendeeDetailsDto]
     ticket_details: List[TicketDetailsDto]
+    total_bookings_count: int
+    cancelled_bookings_count: int
+    pending_bookings_count: int
+    available_seats: int
 
 @dataclass
 class FeedbackDto:

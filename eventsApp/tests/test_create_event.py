@@ -9,7 +9,8 @@ from eventsApp.presenters.event_presenter import EventPresenter
 
 from eventsApp.exceptions.exceptions import (
     InvalidDataException,
-    OrganizerNotFoundException
+    OrganizerNotFoundException,
+    UserCannotCreateEventException
 )
 
 
@@ -88,4 +89,76 @@ class TestCreateEvent:
         )
 
         with pytest.raises(OrganizerNotFoundException):
+            interactor.create_event(eventDto)
+
+    def test_attendee_cannot_create_event(self):
+
+        attendee = UserFactory(role='attendee')
+
+        eventDto = CreateEventDTO(
+            event_title="Invalid Organizer",
+            description="Testing",
+            organizer=attendee.id,
+            start_date="2026-05-10T10:00:00Z",
+            end_date="2026-05-10T13:00:00Z",
+            venue="Gachibowli",
+            is_paid=True,
+            maximum_attendees=100,
+            ticket_price=1000.0
+        )
+
+        interactor = CreateEventInteractor(
+            storage=EventStorage(),
+            presenter=EventPresenter()
+        )
+
+        with pytest.raises(UserCannotCreateEventException):
+            interactor.create_event(eventDto)
+
+    def test_create_event_with_ticket_price_none(self):
+
+        organizer = UserFactory(role='organizer')
+
+        eventDto = CreateEventDTO(
+            event_title="Standup",
+            description="Testing",
+            organizer=organizer.id,
+            start_date="2026-05-10T10:00:00Z",
+            end_date="2026-05-10T13:00:00Z",
+            venue="Gachibowli",
+            is_paid=True,
+            maximum_attendees=100,
+            ticket_price=None
+        )
+
+        interactor = CreateEventInteractor(
+            storage=EventStorage(),
+            presenter=EventPresenter()
+        )
+
+        with pytest.raises(InvalidDataException):
+            interactor.create_event(eventDto)
+
+    def test_create_event_with_is_paid_none(self):
+
+        organizer = UserFactory(role='organizer')
+
+        eventDto = CreateEventDTO(
+            event_title="Standup",
+            description="Testing",
+            organizer=organizer.id,
+            start_date="2026-05-10T10:00:00Z",
+            end_date="2026-05-10T13:00:00Z",
+            venue="Gachibowli",
+            is_paid=None,
+            maximum_attendees=100,
+            ticket_price=1000.0
+        )
+
+        interactor = CreateEventInteractor(
+            storage=EventStorage(),
+            presenter=EventPresenter()
+        )
+
+        with pytest.raises(InvalidDataException):
             interactor.create_event(eventDto)

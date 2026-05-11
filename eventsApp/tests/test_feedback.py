@@ -7,6 +7,7 @@ from eventsApp.tests.factories import (
 )
 
 from eventsApp.adaptors.dtos import FeedbackDto
+from eventsApp.models import Feedback
 
 from eventsApp.interactors.feedback_interactor import FeedBackInteractor
 from eventsApp.storages.feedback_storage import FeedbackStorage
@@ -111,6 +112,54 @@ class TestFeedback:
             comment="Good event",
             event_id=event.id,
             attendee_id=attendee.id
+        )
+
+        interactor = FeedBackInteractor(
+            storage=FeedbackStorage(),
+            presenter=FeedbackPresenter()
+        )
+
+        with pytest.raises(InvalidBookingException):
+            interactor.create_feedback(feedbackDto)
+
+    def test_create_feedback_updates_existing_feedback(self):
+
+        booking = BookingFactory(booking_status='booked')
+        existing_feedback = Feedback.objects.create(
+            booking=booking,
+            rating=3,
+            comment="Average event"
+        )
+
+        feedbackDto = FeedbackDto(
+            rating=5,
+            comment="Good event",
+            event_id=booking.event.id,
+            attendee_id=booking.attendee.id
+        )
+
+        interactor = FeedBackInteractor(
+            storage=FeedbackStorage(),
+            presenter=FeedbackPresenter()
+        )
+
+        response = interactor.create_feedback(feedbackDto)
+
+        existing_feedback.refresh_from_db()
+
+        assert response["id"] == existing_feedback.id
+        assert existing_feedback.rating == 5
+        assert existing_feedback.comment == "Good event"
+
+    def test_create_feedback_with_pending_booking(self):
+
+        booking = BookingFactory(booking_status='pending')
+
+        feedbackDto = FeedbackDto(
+            rating=5,
+            comment="Good event",
+            event_id=booking.event.id,
+            attendee_id=booking.attendee.id
         )
 
         interactor = FeedBackInteractor(
