@@ -5,6 +5,7 @@ class UserStorageInterface(ABC):
     @abstractmethod
     def create_user(self, userDto: CreateUserDTO):
         pass
+
     @abstractmethod
-    def user_exists(self, email: str):
+    def get_existing_user_fields(self, username: str, email: str, phone_number: str):
         pass

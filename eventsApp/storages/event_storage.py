@@ -1,4 +1,6 @@
-from eventsApp.models import Event, User, Ticket
+from django.db.models import Prefetch
+
+from eventsApp.models import Booking, Event, User, Ticket
 from eventsApp.interactors.storage_interfaces.event_storage_interface import EventStorageInterface
 from eventsApp.adaptors.dtos import EventDetailsDto, OrganizerDetailsDto, AttendeeDetailsDto, TicketDetailsDto
 
@@ -25,9 +27,30 @@ class EventStorage(EventStorageInterface):
             return None
          
     def get_event_details(self, event_id):
+        booking_queryset = Booking.objects.select_related('attendee').only(
+            'booking_status',
+            'attendee__id',
+            'attendee__email',
+            'attendee__username',
+            'event_id',
+        )
         event = Event.objects.select_related('organizer').prefetch_related(
-            'tickets',
-            'bookings__attendee'
+            Prefetch('tickets', queryset=Ticket.objects.only('price', 'event_id')),
+            Prefetch(
+                'bookings',
+                queryset=booking_queryset.filter(booking_status='booked'),
+                to_attr='booked_bookings',
+            ),
+            Prefetch(
+                'bookings',
+                queryset=booking_queryset.filter(booking_status='cancelled'),
+                to_attr='cancelled_bookings',
+            ),
+            Prefetch(
+                'bookings',
+                queryset=booking_queryset.filter(booking_status='pending'),
+                to_attr='pending_bookings',
+            ),
         ).get(id=event_id)
 
         eventData = EventDetailsDto(
@@ -50,21 +73,21 @@ class EventStorage(EventStorageInterface):
                     attendee_id= booking.attendee.id,
                     attendee_email=booking.attendee.email,
                     attendee_name=booking.attendee.username
-                ) for booking in event.bookings.filter(booking_status='booked')
+                ) for booking in event.booked_bookings
             ],
             booking_cancelled_users = [
                 AttendeeDetailsDto(
                     attendee_id= booking.attendee.id,
                     attendee_email=booking.attendee.email,
                     attendee_name=booking.attendee.username
-                ) for booking in event.bookings.filter(booking_status='cancelled')
+                ) for booking in event.cancelled_bookings
             ],
             booking_pending_users =[
                 AttendeeDetailsDto(
                     attendee_id= booking.attendee.id,
                     attendee_email=booking.attendee.email,
                     attendee_name=booking.attendee.username
-                ) for booking in event.bookings.filter(booking_status='pending')
+                ) for booking in event.pending_bookings
             ],
         
             ticket_details= [

@@ -8,7 +8,7 @@ class UserPresenter:
         return {
             "message": "Please ensure all the required fields are passed with proper values"
         }
-    def invalid_mail(self):
+    def invalid_mail(self, message="User already exists"):
         return {
-            "message": "User already exists"
+            "message": message
         }

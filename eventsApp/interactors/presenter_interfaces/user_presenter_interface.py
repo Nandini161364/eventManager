@@ -11,5 +11,5 @@ class UserPresenterInterface(ABC):
         pass
 
     @abstractmethod
-    def invalid_mail(self):
+    def invalid_mail(self, message="User already exists"):
         pass

@@ -83,7 +83,7 @@ def register_user(request):
         return Response(response, 200)
 
     except UserAlreadyExitsException as e:
-        return Response(UserPresenter().invalid_mail(), 400)
+        return Response(UserPresenter().invalid_mail(str(e)), 400)
     except InvalidDataException as e:
         return Response(UserPresenter().invalid_data(), 400)
 
